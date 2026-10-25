@@ -1,335 +1,894 @@
-/* MapVote HUD — Panorama CSS only (see workshop/panorama-css.md). */
-
-@keyframes mv-in
-{
-	0%
-	{
-		transform: scale3d( 0.96, 0.96, 1.0 );
-		opacity: 0.0;
-	}
-	100%
-	{
-		transform: scale3d( 1.0, 1.0, 1.0 );
-		opacity: 1.0;
-	}
-}
-
-@keyframes mv-out
-{
-	0%
-	{
-		transform: scale3d( 1.0, 1.0, 1.0 );
-		opacity: 1.0;
-	}
-	100%
-	{
-		transform: scale3d( 0.96, 0.96, 1.0 );
-		opacity: 0.0;
-	}
-}
-
-@keyframes mv-bump
-{
-	0%
-	{
-		transform: scale3d( 1.06, 1.06, 1.0 );
-	}
-	100%
-	{
-		transform: scale3d( 1.0, 1.0, 1.0 );
-	}
-}
+/* MapVote HUD — CS2 end-of-match vote (ruleset-safe).
+   Contract: vote.xml / VoteIds.cs  Palette: surface #12171ee8→#0b0f14f2, accent #ff9a1a
+   Deviation: background-position 50% 50% on .MapShot only — centers the 343×193 cover crop (§5.1). */
 
 .HudScreen
 {
 	width: 100%;
 	height: 100%;
+	z-index: 99999;
 }
 
 .VoteRoot
 {
 	width: 100%;
 	height: 100%;
+	flow-children: none;
+	opacity: 1.0;
+	transition-property: opacity;
+	transition-duration: 0.25s;
+	transition-timing-function: ease-out;
+}
+
+.VoteRoot.is-fading
+{
+	opacity: 0.0;
+	transition-duration: 0.18s;
+	transition-timing-function: ease-in;
+}
+
+.VoteRoot.is-off
+{
+	visibility: collapse;
+}
+
+.mv-glass
+{
+	width: 100%;
+	height: 100%;
+	background-color: #0000000d;
+	world-blur: gaussian( 1 );
+}
+
+/* One pass: top vignette plus a darker foot. Replaces two fullscreen gradients. */
+.mv-scrim
+{
+	width: 100%;
+	height: 100%;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #000000e0 ), color-stop( 0.22, #0000008a ), color-stop( 0.5, #00000070 ), color-stop( 0.78, #00000078 ), to( #000000a0 ) );
+}
+
+.VoteColumn
+{
+	width: 100%;
+	height: 100%;
+	flow-children: down;
+}
+
+.VoteTopBar
+{
+	width: 100%;
+	height: 40px;
+	flow-children: none;
+}
+
+.VoteTitle
+{
+	/* No fixed height: Panorama paints label text at the top of the box, so a
+	   28px box centered in this 40px bar sits the glyphs above the button. */
+	width: 100%;
 	horizontal-align: center;
 	vertical-align: middle;
+	text-align: center;
+	font-family: Stratum2 Bold Condensed;
+	font-size: 20;
+	letter-spacing: 1.6px;
+	text-transform: uppercase;
+	color: #ffffff;
 }
 
-.VoteRoot.ph-fs
+.MinimizeBtn
+{
+	width: 108px;
+	height: 28px;
+	horizontal-align: right;
+	vertical-align: middle;
+	margin-right: 16px;
+	padding: 0px;
+	background-color: #00000099;
+	border: 1px solid #ffffff33;
+	border-radius: 3px;
+	flow-children: none;
+	wash-color: none;
+	transition-property: background-color, brightness;
+	transition-duration: 0.15s;
+	transition-timing-function: ease-out;
+}
+
+.MinimizeBtn:hover
+{
+	background-color: #ffffff22;
+	brightness: 1.1;
+	sound: "UIPanorama.generic_button_rollover";
+}
+
+.MinimizeBtn:active
+{
+	brightness: 0.85;
+	sound: "UIPanorama.generic_button_press";
+}
+
+.MinimizeLabel
 {
 	width: 100%;
-	height: 100%;
+	horizontal-align: center;
+	vertical-align: middle;
+	text-align: center;
+	font-family: Stratum2 Bold Condensed;
+	font-size: 14;
+	letter-spacing: 1.2px;
+	text-transform: uppercase;
+	color: #ffffff;
+	white-space: nowrap;
 }
 
-.VoteRoot.ph-card
+.VoteRoot.is-minimized .mv-glass,
+.VoteRoot.is-minimized .mv-scrim,
+.VoteRoot.is-minimized .VoteBody,
+.VoteRoot.is-minimized .VoteTitle,
+.VoteRoot.is-minimized .CreditBar
 {
-	background-color: gradient( linear, 0% 0%, 0% 100%, from( #0d1118ee ), to( #121820f2 ) );
-	border: 1px solid #ffffff14;
-	box-shadow: #000000aa 0px 18px 48px 0px;
-	overflow: noclip;
+	visibility: collapse;
 }
 
-.VoteRoot.ph-on
+.VoteRoot.is-minimized .MinimizeBtn
 {
-	animation-name: mv-in;
-	animation-duration: 0.22s;
-	animation-timing-function: ease-out;
-	animation-fill-mode: forwards;
+	background-color: #000000cc;
+	border: 1px solid #ff9a1a;
 }
 
-.VoteRoot.ph-off
+.VoteRoot.is-minimized .MinimizeLabel
 {
-	animation-name: mv-out;
-	animation-duration: 0.16s;
-	animation-timing-function: ease-in;
-	animation-fill-mode: forwards;
-}
-
-.mv-bg
-{
-	width: 100%;
-	height: 100%;
-	background-color: #070a10cc;
-	background-image: url( "s2r://panorama/images/backgrounds/bluedots_large_png.vtex" );
-	background-size: auto auto;
-	background-img-opacity: 0.04;
-	wash-color: #7aa2ff;
-	saturation: 0.35;
-	world-blur: hologram;
-	ignore-parent-flow: true;
+	color: #ff9a1a;
 }
 
 .VoteBody
 {
 	width: 100%;
-	height: 100%;
+	height: fill-parent-flow( 1.0 );
 	flow-children: down;
-	padding: 36px 40px 36px 40px;
+	padding-top: 12px;
 }
 
-.VoteHeader
+.VotedSection
 {
 	width: 100%;
-	flow-children: right;
-	margin-bottom: 16px;
+	flow-children: down;
+	padding-top: 8px;
+	padding-bottom: 12px;
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #000000b3 ), to( #00000066 ) );
+	border-bottom: 1px solid #ffffff14;
 }
 
-.VoteTitle
+.VotedSection.has-votes
 {
-	font-size: 42;
-	color: #f2f5ff;
-	text-shadow: #000000aa 0px 2px 10px 0px;
-	horizontal-align: left;
-	vertical-align: middle;
+	border-bottom: 2px solid #ff9a1a;
 }
 
-.VoteTimer
-{
-	font-size: 36;
-	color: #9eb6ff;
-	text-shadow: #000000aa 0px 2px 10px 0px;
-	horizontal-align: right;
-	vertical-align: middle;
-	width: fill-parent-flow( 1.0 );
-	text-align: right;
-}
-
-/* Top strip: maps with votes, sorted by count. Horizontal scroll when >5. */
 .VotedRow
 {
 	width: 100%;
-	height: fit-children;
-	flow-children: right;
-	overflow: scroll noclip;
-	margin-bottom: 14px;
-	padding-bottom: 6px;
+	height: 213px;
+	overflow: scroll clip;
+	flow-children: none;
+	horizontal-align: center;
 }
 
-.VotedRow.is-empty
+.VotedHint
+{
+	width: 100%;
+	horizontal-align: center;
+	vertical-align: middle;
+	text-align: center;
+	font-family: Stratum2 Bold Condensed;
+	font-size: 14;
+	color: #a3acb6;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	z-index: 1;
+}
+
+.VotedHint.is-off
 {
 	visibility: collapse;
-	height: 0px;
-	margin-bottom: 0px;
-	padding-bottom: 0px;
 }
 
-/* Full catalog. Vertical scroll + wrap, five columns. */
-.MapGrid
+.VotedStrip
+{
+	height: 213px;
+	flow-children: right;
+	overflow: noclip noclip;
+	horizontal-align: center;
+	vertical-align: middle;
+}
+
+/* Slot pitch = 110px tile + 8px + 8px margin = 126px */
+.VotedStrip.vw-0 { width: 0px; }
+.VotedStrip.vw-1 { width: 126px; }
+.VotedStrip.vw-2 { width: 252px; }
+.VotedStrip.vw-3 { width: 378px; }
+.VotedStrip.vw-4 { width: 504px; }
+.VotedStrip.vw-5 { width: 630px; }
+.VotedStrip.vw-6 { width: 756px; }
+.VotedStrip.vw-7 { width: 882px; }
+.VotedStrip.vw-8 { width: 1008px; }
+.VotedStrip.vw-9 { width: 1134px; }
+.VotedStrip.vw-10 { width: 1260px; }
+.VotedStrip.vw-11 { width: 1386px; }
+.VotedStrip.vw-12 { width: 1512px; }
+.VotedStrip.vw-13 { width: 1638px; }
+.VotedStrip.vw-14 { width: 1764px; }
+.VotedStrip.vw-15 { width: 1890px; }
+.VotedStrip.vw-16 { width: 2016px; }
+.VotedStrip.vw-17 { width: 2142px; }
+.VotedStrip.vw-18 { width: 2268px; }
+.VotedStrip.vw-19 { width: 2394px; }
+.VotedStrip.vw-20 { width: 2520px; }
+.VotedStrip.vw-21 { width: 2646px; }
+.VotedStrip.vw-22 { width: 2772px; }
+.VotedStrip.vw-23 { width: 2898px; }
+.VotedStrip.vw-24 { width: 3024px; }
+.VotedStrip.vw-25 { width: 3150px; }
+.VotedStrip.vw-26 { width: 3276px; }
+.VotedStrip.vw-27 { width: 3402px; }
+.VotedStrip.vw-28 { width: 3528px; }
+.VotedStrip.vw-29 { width: 3654px; }
+.VotedStrip.vw-30 { width: 3780px; }
+.VotedStrip.vw-31 { width: 3906px; }
+.VotedStrip.vw-32 { width: 4032px; }
+.VotedStrip.vw-33 { width: 4158px; }
+.VotedStrip.vw-34 { width: 4284px; }
+.VotedStrip.vw-35 { width: 4410px; }
+.VotedStrip.vw-36 { width: 4536px; }
+.VotedStrip.vw-37 { width: 4662px; }
+.VotedStrip.vw-38 { width: 4788px; }
+.VotedStrip.vw-39 { width: 4914px; }
+.VotedStrip.vw-40 { width: 5040px; }
+.VotedStrip.vw-41 { width: 5166px; }
+.VotedStrip.vw-42 { width: 5292px; }
+.VotedStrip.vw-43 { width: 5418px; }
+.VotedStrip.vw-44 { width: 5544px; }
+.VotedStrip.vw-45 { width: 5670px; }
+.VotedStrip.vw-46 { width: 5796px; }
+.VotedStrip.vw-47 { width: 5922px; }
+.VotedStrip.vw-48 { width: 6048px; }
+.VotedStrip.vw-49 { width: 6174px; }
+.VotedStrip.vw-50 { width: 6300px; }
+
+.FilterBar
+{
+	width: fit-children;
+	height: 36px;
+	flow-children: right;
+	horizontal-align: center;
+	vertical-align: middle;
+	padding-left: 12px;
+	padding-right: 12px;
+	margin-bottom: 4px;
+}
+
+.FilterBar.is-off
+{
+	visibility: collapse;
+}
+
+.FilterTypeRow,
+.FilterSortRow
+{
+	height: 36px;
+	flow-children: right;
+	vertical-align: middle;
+}
+
+.FilterSortRow
+{
+	margin-left: 16px;
+}
+
+.FilterChip
+{
+	height: 28px;
+	min-width: 72px;
+	padding-left: 12px;
+	padding-right: 12px;
+	margin-right: 8px;
+	vertical-align: middle;
+	background-color: #ffffff0d;
+	border: 1px solid #ffffff14;
+	border-radius: 3px;
+	flow-children: none;
+	transition-property: background-color, brightness;
+	transition-duration: 0.15s;
+	transition-timing-function: ease-out;
+	wash-color: none;
+}
+
+.FilterChip.is-off
+{
+	visibility: collapse;
+}
+
+.FilterChip.is-disabled
+{
+	opacity: 0.35;
+	cursor: default;
+}
+
+.FilterChip:not(.is-disabled):hover
+{
+	background-color: #ffffff1c;
+	sound: "UIPanorama.generic_button_rollover";
+}
+
+.FilterChip:not(.is-disabled):active
+{
+	background-color: #ffffff2e;
+	brightness: 0.9;
+	sound: "UIPanorama.generic_button_press";
+}
+
+.FilterChip.is-disabled:hover,
+.FilterChip.is-disabled:active
+{
+	background-color: #ffffff0d;
+	brightness: 1.0;
+	sound: "";
+}
+
+.FilterChip.is-active
+{
+	background-color: #ff9a1a22;
+	border: 1px solid #ff9a1a;
+}
+
+.FilterChip.is-active:not(.is-disabled):hover
+{
+	background-color: #ff9a1a44;
+}
+
+.FilterChipLabel
+{
+	width: 100%;
+	horizontal-align: center;
+	vertical-align: middle;
+	text-align: center;
+	font-family: Stratum2 Bold Condensed;
+	font-size: 14;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	color: #e8eef4;
+	white-space: nowrap;
+}
+
+.FilterChip.is-active .FilterChipLabel
+{
+	color: #ffd27a;
+}
+
+.MapGridHost
 {
 	width: 100%;
 	height: fill-parent-flow( 1.0 );
-	flow-children: right-wrap;
-	overflow: squish scroll;
-	horizontal-align: center;
-	padding-top: 4px;
+	flow-children: none;
 }
 
-.VoteRoot.is-reveal .VotedRow,
-.VoteRoot.is-reveal .MapGrid
+.MapGrid
+{
+	width: 100%;
+	height: 100%;
+	overflow: squish scroll;
+	flow-children: down;
+}
+
+.MapEmpty
+{
+	width: 100%;
+	height: 36px;
+	horizontal-align: center;
+	text-align: center;
+	font-family: Stratum2 Bold Condensed;
+	font-size: 16;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	color: #a3acb6;
+	margin-top: 24px;
+}
+
+.MapEmpty.is-off
 {
 	visibility: collapse;
 }
 
-/* Five per row: padding replaces margin so 5×20% = 100%. */
+.MapCatalog
+{
+	width: 100%;
+	flow-children: down;
+	overflow: noclip noclip;
+	horizontal-align: center;
+	padding-left: 12px;
+	padding-right: 12px;
+}
+
+.MapCatalog.rows-0 { height: 0px; }
+.MapCatalog.rows-1 { height: 213px; }
+.MapCatalog.rows-2 { height: 426px; }
+.MapCatalog.rows-3 { height: 639px; }
+.MapCatalog.rows-4 { height: 852px; }
+.MapCatalog.rows-5 { height: 1065px; }
+
+.CatalogRow
+{
+	width: 100%;
+	height: 213px;
+	flow-children: right;
+	horizontal-align: center;
+}
+
+.CatalogRow.is-off
+{
+	visibility: collapse;
+}
+
+.MapSlot
+{
+	width: 110px;
+	height: 213px;
+	horizontal-align: center;
+	flow-children: none;
+	margin: 0px 8px 0px 8px;
+}
+
+.CatalogRow .MapSlot
+{
+	width: fill-parent-flow( 1.0 );
+}
+
+.MapSlot.is-off
+{
+	visibility: collapse;
+}
+
 .MapTile
 {
-	width: 20%;
-	height: width-percentage( 56.25% );
-	padding: 8px;
-	background-color: #00000000;
-	transition-property: transform, box-shadow;
-	transition-duration: 0.12s;
+	width: 100%;
+	height: 193px;
+	vertical-align: middle;
+	border: 0px solid #00000000;
+	box-shadow: none;
+	wash-color: none;
+	overflow: clip;
+	flow-children: none;
+	transition-property: brightness;
+	transition-duration: 0.25s;
 	transition-timing-function: ease-out;
-	overflow: noclip;
+}
+
+.MapTile.is-self
+{
+	border: 2px solid #ffffff;
+	box-shadow: #ffffff 0px 0px 6px 0px;
+}
+
+.MapTile.is-lost
+{
+	wash-color: #000000;
+	brightness: 0.55;
+	border: 0px solid #00000000;
+	box-shadow: none;
+	transition-property: wash-color, brightness;
+	transition-duration: 0.5s;
+	transition-timing-function: ease-out;
 }
 
 .MapTile:hover
 {
-	transform: scale3d( 1.02, 1.02, 1.0 );
-	box-shadow: #00000088 0px 10px 28px 0px;
+	sound: "UIPanorama.submenu_contents_rollover";
 }
 
 .MapTile:active
 {
-	transform: scale3d( 0.98, 0.98, 1.0 );
 	sound: "UIPanorama.submenu_select";
-	sound-optical: "UIPanorama.submenu_select";
 }
 
-.MapTile.is-empty
+.MapTile.is-lost:hover .MapShot
 {
-	visibility: collapse;
-}
-
-.MapTile.is-mine
-{
-	box-shadow: #f0c85a55 0px 0px 18px 0px;
-}
-
-.MapTile.bump-a,
-.MapTile.bump-b
-{
-	animation-name: mv-bump;
-	animation-duration: 0.28s;
-	animation-timing-function: ease-out;
-	animation-fill-mode: forwards;
+	transform: scale3d( 1.0, 1.0, 1.0 );
 }
 
 .MapShot
 {
 	width: 100%;
 	height: 100%;
-	background-color: #1a2430;
-	background-size: 100% 100%;
+	z-index: 0;
+	transform: scale3d( 1.0, 1.0, 1.0 );
 	background-repeat: no-repeat;
+	background-size: 343px 193px;
 	background-position: 50% 50%;
-	border: 2px solid #ffffff18;
-	saturation: 0.0;
+	transition-property: transform;
+	transition-duration: 0.25s;
+	transition-timing-function: ease-out;
 }
 
 .MapTile:hover .MapShot
 {
-	border: 2px solid #9eb6ffaa;
-	saturation: 1.0;
+	transform: scale3d( 1.2, 1.2, 1.0 );
 }
 
-.MapTile.is-voted .MapShot
+.MapTile.is-self .MapShot
 {
-	border: 2px solid #9eb6ff88;
-	saturation: 1.0;
-	blur: gaussian( 2.5 );
+	transform: scale3d( 1.2, 1.2, 1.0 );
 }
 
-.MapTile.is-mine .MapShot
+.MapFade
 {
-	border: 2px solid #f0c85a;
-	saturation: 1.0;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+	/* Clear through mid-tile; shadow ramps below for vote count + name. */
+	background-color: gradient( linear, 0% 0%, 0% 100%, from( #00000000 ), color-stop( 0.5, #00000000 ), color-stop( 0.7, #000000aa ), to( #000000ff ) );
 }
 
 .MapVotes
 {
-	horizontal-align: right;
+	width: 100%;
+	z-index: 2;
 	vertical-align: bottom;
-	margin: 0px 18px 16px 0px;
-	font-size: 28;
+	horizontal-align: center;
+	margin: 0px;
+	margin-bottom: 40px;
+	font-family: Stratum2;
+	font-size: 26;
+	color: #ff9a1a;
+	text-align: center;
+}
+
+.MapName
+{
+	width: 90%;
+	height: 36px;
+	z-index: 2;
+	margin: 0px 4px 6px 4px;
+	vertical-align: bottom;
+	horizontal-align: center;
+	text-align: center;
+	font-family: Stratum2 Bold Condensed;
+	font-size: 16;
 	color: #ffffff;
-	text-shadow: #000000cc 0px 2px 6px 0px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
-.MapVotesBack
+.FavBtn
 {
-	color: #000000;
-	text-shadow: #000000 1px 1px 0px 0px,
-		#000000 -1px -1px 0px 0px,
-		#000000 1px -1px 0px 0px,
-		#000000 -1px 1px 0px 0px;
-	z-index: -1;
+	width: 28px;
+	height: 28px;
+	horizontal-align: right;
+	vertical-align: top;
+	/* MapTile is 193px centered in 213px MapSlot → 10px top gap; +4px inset. */
+	margin-top: 14px;
+	margin-right: 4px;
+	/* Above MapTile / MapFade (z 0–3). */
+	z-index: 4;
+	flow-children: none;
+	wash-color: none;
+	background-color: #00000066;
+	border-radius: 3px;
+	transition-property: background-color, brightness;
+	transition-duration: 0.15s;
+	transition-timing-function: ease-out;
 }
 
-.Winner
+.FavBtn:hover
 {
-	width: 720px;
-	height: fit-children;
+	background-color: #00000099;
+	brightness: 1.1;
+	sound: "UIPanorama.generic_button_rollover";
+}
+
+.FavBtn:active
+{
+	brightness: 0.85;
+	sound: "UIPanorama.generic_button_press";
+}
+
+.FavIcon
+{
+	width: 20px;
+	height: 20px;
 	horizontal-align: center;
 	vertical-align: middle;
-	flow-children: down;
-	margin-top: 40px;
-}
-
-.Winner.is-empty
-{
-	visibility: collapse;
-}
-
-.WinnerFrame
-{
-	width: 720px;
-	height: 405px;
-	overflow: noclip;
-}
-
-.WinnerShot
-{
-	width: 720px;
-	height: 405px;
-	border: 3px solid #f0c85a;
-	box-shadow: #f0c85a66 0px 0px 28px 0px;
-	background-color: #1a2430;
-	background-size: 100% 100%;
+	background-image: url( "s2r://panorama/images/icons/ui/favorite_no.vsvg" );
+	background-size: 20px 20px;
 	background-repeat: no-repeat;
 	background-position: 50% 50%;
 }
 
-.WinnerName
+.FavBtn.is-on .FavIcon
 {
+	background-image: url( "s2r://panorama/images/icons/ui/favorite_yes.vsvg" );
+}
+
+@keyframes 'mv-winner-pulse'
+{
+	0%
+	{
+		border: 2px solid #ffffff00;
+	}
+
+	50%
+	{
+		border: 5px solid #ffff00;
+	}
+
+	100%
+	{
+		border: 2px solid #ffffff;
+	}
+}
+
+.MapTile.is-done
+{
+	wash-color: none;
+	brightness: 1.0;
+	border: 2px solid #ffffff;
+	box-shadow: #ffffff 0px 0px 6px 0px;
+	animation-name: 'mv-winner-pulse';
+	animation-duration: 0.5s;
+	animation-timing-function: ease-out;
+	animation-iteration-count: 1;
+}
+
+.MapTile.is-done .MapShot
+{
+	transform: scale3d( 1.2, 1.2, 1.0 );
+}
+
+.MapWinnerCheck
+{
+	width: 50px;
+	height: 50px;
+	z-index: 3;
+	vertical-align: middle;
 	horizontal-align: center;
-	margin-top: 18px;
-	font-size: 40;
-	color: #f2f5ff;
-	text-shadow: #000000aa 0px 2px 10px 0px;
+	background-image: url( "s2r://panorama/images/icons/ui/vote_check.vsvg" );
+	background-size: 50px 50px;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	wash-color: #2bff00;
+	opacity: 0.0;
+	transform: scale3d( 2.0, 2.0, 1.0 );
+	transition-property: transform, opacity;
+	transition-duration: 0.2s;
+	transition-timing-function: ease-out;
 }
 
-.WinnerVotes
+.MapTile.is-done .MapWinnerCheck
 {
-	horizontal-align: right;
-	vertical-align: bottom;
-	margin: 0px 16px 12px 0px;
-	font-size: 36;
-	color: #ffffff;
-	text-shadow: #000000cc 0px 2px 6px 0px;
+	opacity: 1.0;
+	transform: scale3d( 1.0, 1.0, 1.0 );
 }
 
-.Winner.tick-a .WinnerShot
+.CreditBar
 {
-	brightness: 1.08;
+	width: 100%;
+	height: 30px;
+	background-color: #0b0f14f2;
+	flow-children: none;
 }
 
-.Winner.tick-b .WinnerShot
+.CreditLabel
 {
-	brightness: 0.92;
+	width: 100%;
+	horizontal-align: center;
+	vertical-align: middle;
+	text-align: center;
+	font-family: Stratum2 Bold Condensed;
+	font-size: 16;
+	letter-spacing: 1px;
+	color: #a3acb6;
+	white-space: nowrap;
 }
 
 /* BEGIN mv-map-palette */
-/* Map screenshots — class names must stay ASCII-safe for CustomHud.SetHasClass.
-   `make images` rewrites this block from extracted PNGs. */
-.mv-map-default { background-image: url( "s2r://panorama/images/custom_game/mapvote/maps/default.vtex" ); }
+
+.mv-map-default
+{
+	background-image: url("s2r://panorama/images/custom_game/mapvote/maps/default.vtex");
+	background-size: 100% 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.mv-map-cs_militia_css
+{
+	background-image: url("s2r://panorama/images/custom_game/mapvote/maps/cs_militia_css.vtex");
+	background-size: 100% 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.mv-map-de_bikinibottom
+{
+	background-image: url("s2r://panorama/images/custom_game/mapvote/maps/de_bikinibottom.vtex");
+	background-size: 100% 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.mv-map-de_brewery
+{
+	background-image: url("s2r://panorama/images/custom_game/mapvote/maps/de_brewery.vtex");
+	background-size: 100% 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.mv-map-de_cbble_united
+{
+	background-image: url("s2r://panorama/images/custom_game/mapvote/maps/de_cbble_united.vtex");
+	background-size: 100% 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.mv-map-de_debris
+{
+	background-image: url("s2r://panorama/images/custom_game/mapvote/maps/de_debris.vtex");
+	background-size: 100% 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.mv-map-de_dogtown
+{
+	background-image: url("s2r://panorama/images/custom_game/mapvote/maps/de_dogtown.vtex");
+	background-size: 100% 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.mv-map-de_dust2_n
+{
+	background-image: url("s2r://panorama/images/custom_game/mapvote/maps/de_dust2_n.vtex");
+	background-size: 100% 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.mv-map-de_echolab
+{
+	background-image: url("s2r://panorama/images/custom_game/mapvote/maps/de_echolab.vtex");
+	background-size: 100% 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.mv-map-de_extraction_s2
+{
+	background-image: url("s2r://panorama/images/custom_game/mapvote/maps/de_extraction_s2.vtex");
+	background-size: 100% 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.mv-map-de_flick
+{
+	background-image: url("s2r://panorama/images/custom_game/mapvote/maps/de_flick.vtex");
+	background-size: 100% 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.mv-map-de_ganny
+{
+	background-image: url("s2r://panorama/images/custom_game/mapvote/maps/de_ganny.vtex");
+	background-size: 100% 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.mv-map-de_golden
+{
+	background-image: url("s2r://panorama/images/custom_game/mapvote/maps/de_golden.vtex");
+	background-size: 100% 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.mv-map-de_palacio
+{
+	background-image: url("s2r://panorama/images/custom_game/mapvote/maps/de_palacio.vtex");
+	background-size: 100% 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.mv-map-de_rails
+{
+	background-image: url("s2r://panorama/images/custom_game/mapvote/maps/de_rails.vtex");
+	background-size: 100% 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.mv-map-de_safehouse
+{
+	background-image: url("s2r://panorama/images/custom_game/mapvote/maps/de_safehouse.vtex");
+	background-size: 100% 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.mv-map-de_splat
+{
+	background-image: url("s2r://panorama/images/custom_game/mapvote/maps/de_splat.vtex");
+	background-size: 100% 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.mv-map-drawbridge
+{
+	background-image: url("s2r://panorama/images/custom_game/mapvote/maps/drawbridge.vtex");
+	background-size: 100% 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.mv-map-dust2
+{
+	background-image: url("s2r://panorama/images/custom_game/mapvote/maps/dust2.vtex");
+	background-size: 100% 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.mv-map-foroglio
+{
+	background-image: url("s2r://panorama/images/custom_game/mapvote/maps/foroglio.vtex");
+	background-size: 100% 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.mv-map-idk
+{
+	background-image: url("s2r://panorama/images/custom_game/mapvote/maps/idk.vtex");
+	background-size: 100% 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.mv-map-poseidon
+{
+	background-image: url("s2r://panorama/images/custom_game/mapvote/maps/poseidon.vtex");
+	background-size: 100% 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.mv-map-shortdust
+{
+	background-image: url("s2r://panorama/images/custom_game/mapvote/maps/shortdust.vtex");
+	background-size: 100% 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.mv-map-texture_jungle
+{
+	background-image: url("s2r://panorama/images/custom_game/mapvote/maps/texture_jungle.vtex");
+	background-size: 100% 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.mv-map-transit
+{
+	background-image: url("s2r://panorama/images/custom_game/mapvote/maps/transit.vtex");
+	background-size: 100% 100%;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
 /* END mv-map-palette */
