@@ -6,7 +6,7 @@
         "CDmeInputTexture"
         {
             "m_name" "string" "0"
-            "m_fileName" "string" "panorama/images/custom_game/mapvote/maps/ws_mc_lake.png"
+            "m_fileName" "string" "panorama/images/custom_game/mapvote/maps/ws_thera.png"
             "m_colorSpace" "string" "srgb"
             "m_typeString" "string" "2D"
         }
